@@ -1,0 +1,8 @@
+torch~=2.5.1
+torchvision~=0.20.1
+numpy~=2.0.2
+
+pytest~=8.3.4
+tqdm~=4.67.1
+matplotlib~=3.9.3
+piq~=0.8.0

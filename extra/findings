@@ -1,0 +1,8 @@
+Some intr findings:
+ 1. Reconstruction Loss:
+    - Beta-VAE is slightly worse at recreating images than **VAE**, but this is expected because it's trying to make its hidden space (latent space) more organized.
+
+ 2. KL Divergence:
+    - Beta-VAE organizes its hidden space better, with less overlap between features. This makes it easier to understand and control.
+
+ Beta-VAE trades a little image quality to create a hidden space that is cleaner and easier to interpret.
