@@ -6,10 +6,10 @@ from training.train_vae import train_vae
 from utils.dataset import get_cifar10_loaders
 
 MODEL_CONFIG_MAP = {
+    "autoencoder": (AutoencoderConfig, train_autoencoder),
+    "vae": (VAEConfig, train_vae),
     "gan": (GANConfig, train_gan),
     "normalizing_flow": (NormalizingFlowConfig, train_normalizing_flow),
-    " autoencoder": (AutoencoderConfig, train_autoencoder),
-    "vae": (VAEConfig, train_vae),
 }
 
 

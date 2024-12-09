@@ -48,12 +48,7 @@ class Trainer:
             self.optimizer.zero_grad()
             outputs = self.model(inputs)
 
-            if isinstance(outputs, tuple):
-                z, log_det = outputs
-            else:
-                raise ValueError("Model output is not a tuple (z, log_det)")
-
-            loss = self.loss_fn(z, log_det)
+            loss = self.calculate_loss(outputs, inputs)
             loss.backward()
             self.optimizer.step()
 
@@ -73,16 +68,15 @@ class Trainer:
                 inputs = inputs.to(self.device)
                 outputs = self.model(inputs)
 
-                if isinstance(outputs, tuple):
-                    z, log_det = outputs
-                else:
-                    raise ValueError("Model output is not a tuple (z, log_det)")
-
-                loss = self.loss_fn(z, log_det)
+                loss = self.calculate_loss(outputs, inputs)
                 val_loss += loss.item()
 
                 for name, metric_fn in self.metrics.items():
-                    val_metrics[name] += metric_fn(z, inputs)
+                    if isinstance(outputs, tuple):  # For VAE
+                        reconstructed = outputs[0]
+                    else:  # For Autoencoder
+                        reconstructed = outputs
+                    val_metrics[name] += metric_fn(reconstructed, inputs)
 
         for name in val_metrics.keys():
             val_metrics[name] /= len(self.val_loader)
@@ -90,6 +84,20 @@ class Trainer:
         val_loss /= len(self.val_loader)
         self.writer.add_scalar("Loss/Val", val_loss, epoch + 1)
         return val_loss, val_metrics
+
+    def calculate_loss(self, outputs, inputs):
+        if isinstance(outputs, tuple):
+            if len(outputs) == 3:  # For VAE
+                recon_x, mu, logvar = outputs
+                return self.loss_fn(recon_x, inputs, mu, logvar)
+            elif len(outputs) == 2:  # For Normalizing Flow (RealNVP)
+                z, log_det = outputs
+                return self.loss_fn(z, log_det)
+            else:
+                raise ValueError("Unexpected number of outputs from the model.")
+        else:  # For Autoencoder
+            recon_x = outputs
+            return self.loss_fn(recon_x, inputs)
 
     def log_metrics_and_images(self, epoch, train_loss, val_loss, val_metrics):
         self.writer.add_scalar("Loss/Train", train_loss, epoch)
@@ -109,11 +117,9 @@ class Trainer:
             if isinstance(outputs, tuple):
                 outputs = outputs[0]
 
-            # Reshape outputs to match input dimensions if necessary
             if outputs.dim() != inputs.dim():
                 outputs = outputs.view_as(inputs)
 
-            # Create side-by-side comparison images
             comparison = torch.cat((inputs, outputs), dim=0)
 
             grid = make_grid(comparison, nrow=inputs.size(0))

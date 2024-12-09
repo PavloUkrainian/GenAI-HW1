@@ -2,7 +2,7 @@ import torch
 
 
 class BaseConfig:
-    num_epochs = 10
+    num_epochs = 100
     batch_size = 64
     learning_rate = 1e-3
 
