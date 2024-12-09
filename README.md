@@ -33,8 +33,6 @@ Training scripts and utilities:
 
 ### Utilities
 - **Dataset Management** (`dataset.py`): Tools for loading and preprocessing datasets.
-- **Testing**:
-  - Autoencoder testing suite (`test_autoencoder.py`).
 
 ## Installation
 
@@ -100,7 +98,13 @@ You can extend the repository by adding new loss functions, metrics, or models:
 ├── data
 │   └── dataset.py
 ├── testing
-│   └── test_autoencoder.py
+│   ├── test_autoencoder.py
+│   ├── test_custom_loss.py
+│   ├── test_dataset.py
+│   ├── test_gan.py
+│   ├── test_metrics.py
+│   ├── test_vae.py
+│   └── test_vae_loss.py
 ├── main.py
 ├── requirements.txt
 └── README.md
